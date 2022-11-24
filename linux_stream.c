@@ -1,7 +1,7 @@
-#include <limits.h>
+
 #include <stdio.h>
 #include <string.h>
-
+#define LINE_MAX 1024
 FILE *open_file(const char *path, const char *mode) {
   FILE *stream = fopen(path, mode);
   if (!stream) {
