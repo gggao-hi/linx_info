@@ -8,6 +8,9 @@ FILE *open_file(const char *path, const char *mode) {
     perror("open failed");
     return NULL;
   }
+  char buff[BUFSIZ];
+  int ret = setvbuf(stream, buff, _IOFBF, BUFSIZ);
+  printf("setvbuf ret:%d\n", ret);
   return stream;
 }
 void use_stdin_stdout() {
@@ -62,6 +65,30 @@ void fwrite_file(FILE *stream) {
   fflush(stream);
   fclose(stream);
 }
+void ftell_file(FILE *stream) {
+  long position = ftell(stream);
+  printf("position:%ld \n", position);
+}
+void fseek_file(FILE *stream) {
+  int ret = fseek(stream, 0, SEEK_CUR);
+  printf("fseek ret: %d\n", ret);
+  ftell_file(stream);
+}
+void fseek_file_after_read(FILE *stream) {
+  char buff[LINE_MAX];
+
+  fread(buff, LINE_MAX, 1, stream);
+  printf("read:%s\n", buff);
+  fseek_file(stream);
+  int ret = ferror(stream);
+  printf("ferror ret:%d\n", ret);
+  ret = feof(stream);
+  printf("feof ret:%d\n", ret);
+
+  int no = fileno(stream);
+  printf("fileno : %d\n", no);
+  fclose(stream);
+}
 
 int main(int argc, char const *argv[]) {
   use_stdin_stdout();
@@ -75,6 +102,11 @@ int main(int argc, char const *argv[]) {
   printf("============fwrite==============\n");
   fwrite_file(open_file("./files/stream_test.txt", "a"));
   fread_file(open_file("./files/stream_test.txt", "r"));
+  printf("=========fseek file=================\n");
+  FILE *stream = open_file("./files/stream_test.txt", "r");
+  fseek_file(stream);
+  printf("after read\n");
+  fseek_file_after_read(stream);
 
   return 0;
 }
